@@ -8,6 +8,17 @@ exports.createHelpRequest = async (req, res) => {
   try {
     req.body.user = req.user.id;
     
+    // Handle location format from frontend (lat/lng) and convert to GeoJSON
+    if (req.body.location && req.body.location.lat && req.body.location.lng) {
+      req.body.location = {
+        type: 'Point',
+        coordinates: [req.body.location.lng, req.body.location.lat],
+        address: req.body.address || 'Address not provided',
+        lat: req.body.location.lat,
+        lng: req.body.location.lng
+      };
+    }
+    
     const helpRequest = await HelpRequest.create(req.body);
 
     res.status(201).json({
