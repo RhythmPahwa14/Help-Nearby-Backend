@@ -1,6 +1,5 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const cors = require('cors');
 const connectDB = require('./config/db');
 
 // Load environment variables
@@ -10,14 +9,14 @@ const app = express();
 
 // CORS - Must be FIRST before anything else
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   
-  // Handle preflight
+  // Handle preflight - respond immediately
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(200).json({ status: 'ok' });
   }
   next();
 });
@@ -25,8 +24,16 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to database
-connectDB();
+// Database connection middleware - connect on each request for serverless
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('DB Connection failed:', error);
+    res.status(500).json({ success: false, message: 'Database connection failed' });
+  }
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
