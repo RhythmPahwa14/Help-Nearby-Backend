@@ -3,23 +3,27 @@ const mongoose = require('mongoose');
 let isConnected = false;
 
 const connectDB = async () => {
-  if (isConnected) {
+  if (isConnected && mongoose.connection.readyState === 1) {
     console.log('Using existing MongoDB connection');
     return;
   }
 
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    mongoose.set('strictQuery', false);
+    
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false,
+      maxPoolSize: 10,
+    });
+    
     isConnected = true;
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);
-    // Don't exit in serverless - just log the error
-    if (process.env.VERCEL) {
-      console.error('Running on Vercel - not exiting process');
-    } else {
-      process.exit(1);
-    }
+    isConnected = false;
+    throw error;
   }
 };
 
