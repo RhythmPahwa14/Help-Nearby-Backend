@@ -8,9 +8,9 @@ const helpRequestSchema = new mongoose.Schema({
   },
   title: {
     type: String,
+    required: [true, 'Please add a title'],
     trim: true,
-    maxlength: [100, 'Title cannot be more than 100 characters'],
-    default: 'Help Request'
+    maxlength: [100, 'Title cannot be more than 100 characters']
   },
   description: {
     type: String,
@@ -21,11 +21,6 @@ const helpRequestSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please specify a category'],
     enum: [
-      'General',
-      'Groceries', 
-      'Medical',
-      'Transport',
-      'Household',
       'medical',
       'emergency',
       'transport',
@@ -48,18 +43,12 @@ const helpRequestSchema = new mongoose.Schema({
     },
     coordinates: {
       type: [Number],
-      default: [0, 0]
+      required: true
     },
     address: {
       type: String,
-      default: 'Address not provided'
-    },
-    lat: Number,
-    lng: Number
-  },
-  address: {
-    type: String,
-    default: ''
+      required: true
+    }
   },
   status: {
     type: String,
@@ -77,7 +66,7 @@ const helpRequestSchema = new mongoose.Schema({
   }],
   contactNumber: {
     type: String,
-    default: ''
+    required: true
   },
   estimatedTime: {
     type: Number, // in minutes
