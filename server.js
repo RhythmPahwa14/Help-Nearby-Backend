@@ -11,17 +11,35 @@ connectDB();
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://help-nearby.vercel.app',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://help-nearby.vercel.app',
+      'https://help-nearby-git-main-rhythms-projects-ec2b8b44.vercel.app',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now (can restrict later)
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  optionsSuccessStatus: 200
+};
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
