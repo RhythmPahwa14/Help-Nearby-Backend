@@ -30,8 +30,12 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (error) {
-    console.error('DB Connection failed:', error);
-    res.status(500).json({ success: false, message: 'Database connection failed' });
+    console.error('DB Connection failed:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Database connection failed',
+      hint: 'Check MONGODB_URI environment variable'
+    });
   }
 });
 
