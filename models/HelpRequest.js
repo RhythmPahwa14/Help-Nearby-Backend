@@ -77,7 +77,27 @@ const helpRequestSchema = new mongoose.Schema({
     min: 1,
     max: 5
   },
-  feedback: String
+  feedback: String,
+  helpOffers: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    phone: {
+      type: String,
+      required: true
+    },
+    email: String,
+    message: String,
+    offeredAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true
 });
