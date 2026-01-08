@@ -55,9 +55,8 @@ cp .env.example .env
 4. Configure environment variables in `.env`:
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/help-nearby
-# For MongoDB Atlas: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/help-nearby
-JWT_SECRET=your_jwt_secret_key_here_use_random_string
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
 JWT_EXPIRE=7d
 NODE_ENV=development
 ```
@@ -285,13 +284,7 @@ The API returns consistent error responses:
 3. Deploy automatically on push
 
 ### Environment Variables for Production
-```env
-PORT=5000
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/help-nearby
-JWT_SECRET=<strong-random-string>
-JWT_EXPIRE=7d
-NODE_ENV=production
-```
+Set the same environment variables as in `.env` with production values.
 
 ## API Testing
 
