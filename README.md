@@ -56,7 +56,7 @@ cp .env.example .env
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/help-nearby
-# For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/help-nearby
+# For MongoDB Atlas: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/help-nearby
 JWT_SECRET=your_jwt_secret_key_here_use_random_string
 JWT_EXPIRE=7d
 NODE_ENV=development
@@ -287,7 +287,7 @@ The API returns consistent error responses:
 ### Environment Variables for Production
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/help-nearby
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/help-nearby
 JWT_SECRET=<strong-random-string>
 JWT_EXPIRE=7d
 NODE_ENV=production
