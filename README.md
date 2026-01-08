@@ -47,36 +47,16 @@ cd Help-Nearby-Backend
 npm install
 ```
 
-3. Create environment file
-```bash
-cp .env.example .env
-```
-
-4. Configure environment variables in `.env`:
+3. Create `.env` file
 ```env
 PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-JWT_EXPIRE=7d
-NODE_ENV=development
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
 ```
 
-5. Start MongoDB service (if using local MongoDB)
+4. Start the application
 ```bash
-# On Windows
-net start MongoDB
-
-# On macOS/Linux
-sudo systemctl start mongod
-```
-
-6. Run the application
-```bash
-# Development mode with nodemon
 npm run dev
-
-# Production mode
-npm start
 ```
 
 The API will be available at `http://localhost:5000`
