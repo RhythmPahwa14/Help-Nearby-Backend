@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: false,
+    required: [true, 'Please add a phone number'],
     match: [/^\+?[1-9]\d{1,14}$/, 'Please add a valid phone number']
   },
   password: {
@@ -92,7 +92,7 @@ userSchema.pre('save', async function(next) {
 // Sign JWT and return
 userSchema.methods.getSignedJwtToken = function() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '30d'
+    expiresIn: process.env.JWT_EXPIRE
   });
 };
 

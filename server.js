@@ -1,43 +1,20 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const cors = require('cors');
 const connectDB = require('./config/db');
 
 // Load environment variables
 dotenv.config();
 
+// Connect to database
+connectDB();
+
 const app = express();
 
-// CORS - Must be FIRST before anything else
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight - respond immediately
-  if (req.method === 'OPTIONS') {
-    return res.status(200).json({ status: 'ok' });
-  }
-  next();
-});
-
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Database connection middleware - connect on each request for serverless
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error('DB Connection failed:', error.message);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || 'Database connection failed',
-      hint: 'Check MONGODB_URI environment variable'
-    });
-  }
-});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -66,17 +43,14 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Only start server if not in Vercel serverless environment
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  const server = app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  });
+const server = app.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+});
 
-  // Handle unhandled promise rejections
-  process.on('unhandledRejection', (err) => {
-    console.log(`Error: ${err.message}`);
-    server.close(() => process.exit(1));
-  });
-}
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.log(`Error: ${err.message}`);
+  server.close(() => process.exit(1));
+});
 
 module.exports = app;

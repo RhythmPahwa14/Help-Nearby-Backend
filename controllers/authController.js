@@ -171,10 +171,9 @@ exports.updatePassword = async (req, res, next) => {
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 
-  const cookieExpireDays = process.env.JWT_COOKIE_EXPIRE || 30;
   const options = {
     expires: new Date(
-      Date.now() + cookieExpireDays * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
     ),
     httpOnly: true
   };

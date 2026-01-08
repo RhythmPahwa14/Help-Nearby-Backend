@@ -6,42 +6,15 @@ const User = require('../models/User');
 // @access  Private
 exports.createHelpRequest = async (req, res) => {
   try {
-    const { description, category, location, address } = req.body;
+    req.body.user = req.user.id;
     
-    // Convert frontend location format {lat, lng} to GeoJSON format
-    let geoLocation = {
-      type: 'Point',
-      coordinates: [0, 0],
-      address: address || 'Location not specified'
-    };
-    
-    if (location) {
-      if (location.lat && location.lng) {
-        // Frontend format: {lat, lng}
-        geoLocation.coordinates = [location.lng, location.lat];
-      } else if (location.coordinates) {
-        // Already GeoJSON format
-        geoLocation.coordinates = location.coordinates;
-      }
-      if (location.address) {
-        geoLocation.address = location.address;
-      }
-    }
-    
-    const helpRequest = await HelpRequest.create({
-      user: req.user.id,
-      description,
-      category: category || 'General',
-      location: geoLocation,
-      title: description ? description.substring(0, 50) : 'Help Request'
-    });
+    const helpRequest = await HelpRequest.create(req.body);
 
     res.status(201).json({
       success: true,
       data: helpRequest
     });
   } catch (error) {
-    console.error('Create request error:', error);
     res.status(500).json({
       success: false,
       message: error.message
