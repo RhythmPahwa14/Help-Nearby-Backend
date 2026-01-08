@@ -123,90 +123,28 @@ The API will be available at `http://localhost:5000`
 
 ## Data Models
 
-### User Schema
-```javascript
-{
-  name: String (required, max 50 chars),
-  email: String (required, unique, lowercase),
-  phone: String (required, valid phone format),
-  password: String (required, min 6 chars, hashed),
-  role: Enum ['user', 'helper', 'admin'] (default: 'user'),
-  location: {
-    type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: [Number] (longitude, latitude),
-    address: String
-  },
-  profilePicture: String,
-  rating: Number (1-5),
-  totalHelps: Number (default: 0),
-  isVerified: Boolean (default: false),
-  isActive: Boolean (default: true),
-  lastSeen: Date,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+### User
+- name, email (unique), phone, password (hashed)
+- role: user, helper, admin
+- location with GeoJSON Point coordinates
+- profilePicture, rating, totalHelps
+- isVerified, isActive, lastSeen
 
-**Indexes:**
-- `location` - 2dsphere index for geospatial queries
-- `email` - Unique index
-
-### Help Request Schema
-```javascript
-{
-  user: ObjectId (ref: 'User', required),
-  title: String (required, max 100 chars),
-  description: String (required, max 500 chars),
-  category: Enum [
-    'medical', 'emergency', 'transport', 
-    'food', 'shelter', 'assistance', 'other'
-  ] (required),
-  priority: Enum ['low', 'medium', 'high', 'critical'] (default: 'medium'),
-  location: {
-    type: { type: String, enum: ['Point'], default: 'Point' },
-    coordinates: [Number] (required),
-    address: String (required)
-  },
-  status: Enum [
-    'pending', 'accepted', 'in-progress', 
-    'completed', 'cancelled'
-  ] (default: 'pending'),
-  helper: ObjectId (ref: 'User'),
-  acceptedAt: Date,
-  completedAt: Date,
-  images: [String],
-  contactNumber: String (required),
-  estimatedTime: Number (in minutes, default: 30),
-  rating: Number (1-5),
-  feedback: String,
-  helpOffers: [{
-    user: ObjectId (ref: 'User'),
-    name: String (required),
-    phone: String (required),
-    email: String,
-    message: String,
-    offeredAt: Date (default: Date.now)
-  }],
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-**Indexes:**
-- `location` - 2dsphere index for geospatial queries
-- Compound index on `status` and `createdAt` for efficient filtering
+### Help Request
+- user, title, description
+- category: medical, emergency, transport, food, shelter, assistance, other
+- priority: low, medium, high, critical
+- location with GeoJSON Point coordinates
+- status: pending, accepted, in-progress, completed, cancelled
+- helper, helpOffers array, rating, feedback
 
 ## Authentication
 
-The API uses JWT (JSON Web Tokens) for authentication. After login/register, you receive a token.
+The API uses JWT (JSON Web Tokens) for authentication. After login/register, include the token in the Authorization header:
 
-Include the token in the Authorization header for protected routes:
-
-```http
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
-
-**Token Expiration:** 7 days (configurable in `.env`)
+Authorization: Bearer <your_token>
+```
 
 ## Geospatial Queries
 
@@ -232,24 +170,12 @@ GET /api/users/nearby-helpers?longitude=77.5946&latitude=12.9716&radius=5
 Users can now offer help on requests by providing their contact details:
 
 ### Offer Help Endpoint
-```http
+```
 POST /api/help-requests/:id/offer-help
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "phone": "+919876543210",
-  "email": "john@example.com",  // optional
-  "message": "I can help with this!"  // optional
-}
+Body: { name, phone, email (optional), message (optional) }
 ```
 
-**Features:**
-- Multiple users can offer help on the same request
-- Request owner receives all offers with contact details
-- Prevents duplicate offers from the same user
-- Prevents users from offering help on their own requests
+Multiple users can offer help on the same request with their contact details.
 
 ## Error Handling
 
@@ -288,22 +214,7 @@ Set the same environment variables as in `.env` with production values.
 
 ## API Testing
 
-Use tools like:
-- **Postman** - Import collection for easy testing
-- **Thunder Client** - VS Code extension
-- **cURL** - Command line testing
-
-### Example: Register User
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "+919876543210",
-    "password": "password123"
-  }'
-```
+Use Postman, Thunder Client (VS Code extension), or cURL for API testing.
 
 ## Scripts
 
