@@ -1,44 +1,39 @@
 # Help Nearby Backend
 
-A Node.js/Express backend API for the Help Nearby application - a location-based community assistance platform that connects people in need with nearby helpers.
-
-**Live API:** [Help Nearby Backend](https://help-nearby-backend.vercel.app)  
-**Frontend Repo:** https://github.com/RhythmPahwa14/Help-Nearby  
-**Backend Repo:** https://github.com/RhythmPahwa14/Help-Nearby-Backend
+A Node.js/Express backend API for the Help Nearby application - a location-based emergency and assistance platform that connects people in need with nearby helpers.
 
 ## Features
 
-- **User Authentication & Authorization** - JWT-based secure authentication
-- **Location-Based Services** - MongoDB geospatial queries with 2dsphere indexing
-- **Help Request Management** - CRUD operations for help requests
-- **Help Offers System** - Users can offer help with contact details
-- **User Profiles & Ratings** - Track helpers and their ratings
-- **Real-time Notifications Support** - Ready for real-time integration
-- **Nearby Search** - Find helpers and requests within radius
-- **Rating & Review System** - Rate completed help requests
+- User Authentication and Authorization using JWT
+- Location-based Services with Geospatial Queries
+- Help Request Management
+- User Profiles and Ratings
+- Real-time Notifications Support
+- Nearby Helpers Search
+- Rating and Review System
 
 ## Tech Stack
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL Database with Geospatial support
-- **Mongoose** - ODM for MongoDB
-- **JWT** - JSON Web Tokens for authentication
-- **bcryptjs** - Password hashing and encryption
-
-## Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (v4.4 or higher) or MongoDB Atlas account
-- npm or yarn
+- Node.js - Runtime environment
+- Express.js - Web framework
+- MongoDB - Database
+- Mongoose - ODM
+- JWT - Authentication
+- bcryptjs - Password hashing
 
 ## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB (v4.4 or higher)
+- npm or yarn
 
 ### Installation
 
 1. Clone the repository
 ```bash
-git clone https://github.com/RhythmPahwa14/Help-Nearby-Backend.git
+git clone <repository-url>
 cd Help-Nearby-Backend
 ```
 
@@ -47,247 +42,72 @@ cd Help-Nearby-Backend
 npm install
 ```
 
-3. Create `.env` file
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
+3. Create a `.env` file in the root directory and configure the required environment variables. Refer to the application configuration for the necessary keys.
+
+4. Start MongoDB service
+```bash
+# On Windows
+net start MongoDB
+
+# On macOS/Linux
+sudo systemctl start mongod
 ```
 
-4. Start the application
+5. Run the application
 ```bash
+# Development mode
 npm run dev
+
+# Production mode
+npm start
 ```
 
 The API will be available at `http://localhost:5000`
 
 ## API Endpoints
 
-### Authentication (`/api/auth`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/register` | Register new user | No |
-| POST | `/login` | User login | No |
-| GET | `/me` | Get current user | Yes |
-| PUT | `/updatedetails` | Update user details | Yes |
-| PUT | `/updatepassword` | Update password | Yes |
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/auth/register | Register new user |
+| POST | /api/auth/login | User login |
+| GET | /api/auth/me | Get current user |
+| PUT | /api/auth/updatedetails | Update user details |
+| PUT | /api/auth/updatepassword | Update password |
 
-### Users (`/api/users`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/` | Get all users | Admin |
-| GET | `/:id` | Get single user | Yes |
-| PUT | `/:id` | Update user | Yes |
-| DELETE | `/:id` | Delete user | Admin |
-| GET | `/nearby-helpers` | Get nearby helpers | Yes |
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/users | Get all users (Admin only) |
+| GET | /api/users/:id | Get single user |
+| PUT | /api/users/:id | Update user |
+| DELETE | /api/users/:id | Delete user (Admin only) |
+| GET | /api/users/nearby-helpers | Get nearby helpers |
 
-### Help Requests (`/api/help-requests`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/` | Get all help requests | Yes |
-| POST | `/` | Create help request | Yes |
-| GET | `/nearby` | Get nearby help requests | Yes |
-| GET | `/:id` | Get single help request | Yes |
-| PUT | `/:id` | Update help request | Yes |
-| DELETE | `/:id` | Delete help request | Yes |
-| **POST** | **`/:id/offer-help`** | **Offer help with contact details** | **Yes** |
-| PUT | `/:id/accept` | Accept help request | Yes |
-| PUT | `/:id/complete` | Complete help request | Yes |
-| PUT | `/:id/rate` | Rate completed request | Yes |
-
-### Locations (`/api/locations`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/search` | Search locations (geocoding) | No |
-| GET | `/reverse` | Reverse geocode coordinates | No |
-
-## Data Models
-
-### User
-- name, email (unique), phone, password (hashed)
-- role: user, helper, admin
-- location with GeoJSON Point coordinates
-- profilePicture, rating, totalHelps
-- isVerified, isActive, lastSeen
-
-### Help Request
-- user, title, description
-- category: medical, emergency, transport, food, shelter, assistance, other
-- priority: low, medium, high, critical
-- location with GeoJSON Point coordinates
-- status: pending, accepted, in-progress, completed, cancelled
-- helper, helpOffers array, rating, feedback
-
-## Authentication
-
-The API uses JWT (JSON Web Tokens) for authentication. After login/register, include the token in the Authorization header:
-
-```
-Authorization: Bearer <your_token>
-```
-
-## Geospatial Queries
-
-The API uses MongoDB's geospatial features to find nearby requests and helpers.
-
-### Nearby Help Requests
-```http
-GET /api/help-requests/nearby?longitude=77.5946&latitude=12.9716&radius=10
-```
-
-Parameters:
-- `longitude`: -180 to 180 (required)
-- `latitude`: -90 to 90 (required)  
-- `radius`: Distance in kilometers (default: 10)
-
-### Nearby Helpers
-```http
-GET /api/users/nearby-helpers?longitude=77.5946&latitude=12.9716&radius=5
-```
-
-## New Feature: Help Offers
-
-Users can now offer help on requests by providing their contact details:
-
-### Offer Help Endpoint
-```
-POST /api/help-requests/:id/offer-help
-Body: { name, phone, email (optional), message (optional) }
-```
-
-Multiple users can offer help on the same request with their contact details.
-
-## Error Handling
-
-The API returns consistent error responses:
-
-```json
-{
-  "success": false,
-  "message": "Error message here"
-}
-```
-
-**Common HTTP Status Codes:**
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request (validation errors)
-- `401` - Unauthorized (invalid/missing token)
-- `404` - Not Found
-- `500` - Server Error
-
-## Deployment
-
-### Vercel
-1. Install Vercel CLI: `npm i -g vercel`
-2. Run `vercel` in project directory
-3. Set environment variables in Vercel dashboard
-4. Use MongoDB Atlas for production database
-
-### Railway/Render
-1. Connect GitHub repository
-2. Set environment variables
-3. Deploy automatically on push
-
-### Environment Variables for Production
-Set the same environment variables as in `.env` with production values.
-
-## API Testing
-
-Use Postman, Thunder Client (VS Code extension), or cURL for API testing.
-
-## Scripts
-
-- `npm start` - Start production server
-- `npm run dev` - Start development server with nodemon
-- `npm test` - Run tests (if configured)
-
-## Troubleshooting
-
-### MongoDB Connection Issues
-- Verify MongoDB is running: `mongod --version`
-- Check connection string in `.env`
-- For Atlas: Whitelist your IP address
-
-### JWT Issues
-- Ensure `JWT_SECRET` is set in `.env`
-- Check token format in Authorization header
-- Verify token hasn't expired
-
-### Port Conflicts
-- Change `PORT` in `.env` if 5000 is occupied
-- Kill process using port: `npx kill-port 5000`
-
-### Geospatial Query Errors
-- Ensure coordinates are [longitude, latitude] (not reversed!)
-- Verify 2dsphere indexes exist: `db.helprequests.getIndexes()`
-
-## Project Structure
-
-```
-├── config/
-│   └── db.js              # MongoDB connection configuration
-├── controllers/
-│   ├── authController.js  # Authentication logic
-│   ├── helpRequestController.js  # Help request CRUD + offer help
-│   └── userController.js  # User management
-├── middleware/
-│   └── auth.js            # JWT verification middleware
-├── models/
-│   ├── User.js            # User schema with geospatial support
-│   ├── HelpRequest.js     # Help request schema with helpOffers
-│   └── Notification.js    # Notification schema (future use)
-├── routes/
-│   ├── auth.js            # Auth routes
-│   ├── helpRequests.js    # Help request routes
-│   ├── users.js           # User routes
-│   └── locations.js       # Location/geocoding routes
-├── .env                   # Environment variables (not in git)
-├── .env.example           # Example env file
-├── .gitignore
-├── package.json
-├── server.js              # Entry point
-└── vercel.json            # Vercel deployment config
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-## License
-
-ISC
-
-## Author
-
-**Rhythm Pahwa**
-- GitHub: [@RhythmPahwa14](https://github.com/RhythmPahwa14)
-
-## Contact
-
-For questions or support, please open an issue in the repository.
-
----
-
-**Note:** This is the backend API. For the frontend application, visit: [Help Nearby Frontend](https://github.com/RhythmPahwa14/Help-Nearby)
-- `DELETE /api/help-requests/:id` - Delete help request
-- `PUT /api/help-requests/:id/accept` - Accept help request
-- `PUT /api/help-requests/:id/complete` - Complete help request
-- `PUT /api/help-requests/:id/rate` - Rate completed help request
+### Help Requests
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/help-requests | Get all help requests |
+| POST | /api/help-requests | Create help request |
+| GET | /api/help-requests/nearby | Get nearby help requests |
+| GET | /api/help-requests/:id | Get single help request |
+| PUT | /api/help-requests/:id | Update help request |
+| DELETE | /api/help-requests/:id | Delete help request |
+| PUT | /api/help-requests/:id/accept | Accept help request |
+| PUT | /api/help-requests/:id/complete | Complete help request |
+| PUT | /api/help-requests/:id/rate | Rate completed help request |
 
 ### Locations
-- `GET /api/locations/search` - Search locations (geocoding)
-- `GET /api/locations/reverse` - Reverse geocode coordinates
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/locations/search | Search locations (geocoding) |
+| GET | /api/locations/reverse | Reverse geocode coordinates |
 
 ## Data Models
 
 ### User
 - name, email, phone, password
-- role (user/helper/admin)
+- role (user, helper, admin)
 - location (GeoJSON Point)
 - profilePicture, rating, totalHelps
 - isVerified, isActive, lastSeen

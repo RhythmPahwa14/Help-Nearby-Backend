@@ -167,6 +167,15 @@ exports.updateHelpRequest = async (req, res) => {
 // @access  Private
 exports.acceptHelpRequest = async (req, res) => {
   try {
+    const { name, phone, email, message } = req.body;
+
+    if (!name || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide your name and phone number'
+      });
+    }
+
     let helpRequest = await HelpRequest.findById(req.params.id);
 
     if (!helpRequest) {
@@ -184,6 +193,12 @@ exports.acceptHelpRequest = async (req, res) => {
     }
 
     helpRequest.helper = req.user.id;
+    helpRequest.helperOffer = {
+      name,
+      phone,
+      email: email || '',
+      message: message || ''
+    };
     helpRequest.status = 'accepted';
     helpRequest.acceptedAt = Date.now();
 
@@ -330,74 +345,6 @@ exports.deleteHelpRequest = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {}
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-// @desc    Offer help for a request
-// @route   POST /api/help-requests/:id/offer-help
-// @access  Private
-exports.offerHelp = async (req, res) => {
-  try {
-    const { name, phone, email, message } = req.body;
-
-    if (!name || !phone) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide your name and phone number'
-      });
-    }
-
-    let helpRequest = await HelpRequest.findById(req.params.id);
-
-    if (!helpRequest) {
-      return res.status(404).json({
-        success: false,
-        message: 'Help request not found'
-      });
-    }
-
-    // Check if user is trying to offer help on their own request
-    if (helpRequest.user.toString() === req.user.id) {
-      return res.status(400).json({
-        success: false,
-        message: 'You cannot offer help on your own request'
-      });
-    }
-
-    // Check if user has already offered help
-    const existingOffer = helpRequest.helpOffers.find(
-      offer => offer.user && offer.user.toString() === req.user.id
-    );
-
-    if (existingOffer) {
-      return res.status(400).json({
-        success: false,
-        message: 'You have already offered help for this request'
-      });
-    }
-
-    // Add the help offer
-    helpRequest.helpOffers.push({
-      user: req.user.id,
-      name,
-      phone,
-      email: email || '',
-      message: message || '',
-      offeredAt: Date.now()
-    });
-
-    await helpRequest.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Your help offer has been submitted successfully',
-      data: helpRequest
     });
   } catch (error) {
     res.status(500).json({

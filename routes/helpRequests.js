@@ -8,8 +8,7 @@ const {
   acceptHelpRequest,
   completeHelpRequest,
   rateHelpRequest,
-  deleteHelpRequest,
-  offerHelp
+  deleteHelpRequest
 } = require('../controllers/helpRequestController');
 const { protect } = require('../middleware/auth');
 
@@ -29,6 +28,5 @@ router.route('/:id')
 router.put('/:id/accept', protect, acceptHelpRequest);
 router.put('/:id/complete', protect, completeHelpRequest);
 router.put('/:id/rate', protect, rateHelpRequest);
-router.post('/:id/offer-help', protect, offerHelp);
 
 module.exports = router;
