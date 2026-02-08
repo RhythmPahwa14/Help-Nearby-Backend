@@ -86,6 +86,30 @@ const helpRequestSchema = new mongoose.Schema({
       type: String
     }
   },
+  helperOffers: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    phone: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String
+    },
+    message: {
+      type: String
+    },
+    offeredAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   acceptedAt: Date,
   completedAt: Date,
   images: [{
