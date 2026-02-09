@@ -22,25 +22,12 @@ const helpRequestSchema = new mongoose.Schema({
     required: [true, 'Please specify a category'],
     enum: [
       'medical',
-      'Medical',
       'emergency',
-      'Emergency',
       'transport',
-      'Transport',
       'food',
-      'Food',
       'shelter',
-      'Shelter',
       'assistance',
-      'Assistance',
-      'general',
-      'General',
-      'groceries',
-      'Groceries',
-      'household',
-      'Household',
-      'other',
-      'Other'
+      'other'
     ]
   },
   priority: {
@@ -86,37 +73,14 @@ const helpRequestSchema = new mongoose.Schema({
       type: String
     }
   },
-  helperOffers: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    phone: {
-      type: String,
-      required: true
-    },
-    email: {
-      type: String
-    },
-    message: {
-      type: String
-    },
-    offeredAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
   acceptedAt: Date,
   completedAt: Date,
   images: [{
     type: String
   }],
   contactNumber: {
-    type: String
+    type: String,
+    required: true
   },
   estimatedTime: {
     type: Number, // in minutes

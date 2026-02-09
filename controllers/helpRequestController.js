@@ -185,58 +185,28 @@ exports.acceptHelpRequest = async (req, res) => {
       });
     }
 
-    // Check if status is not in-progress or completed
-    if (helpRequest.status === 'in-progress' || helpRequest.status === 'completed' || helpRequest.status === 'cancelled') {
+    if (helpRequest.status !== 'pending') {
       return res.status(400).json({
         success: false,
-        message: 'This help request is no longer accepting offers'
+        message: 'This help request has already been accepted'
       });
     }
 
-    // Check if user has already offered help
-    const existingOffer = helpRequest.helperOffers?.find(
-      offer => offer.user?.toString() === req.user.id
-    );
-
-    if (existingOffer) {
-      return res.status(400).json({
-        success: false,
-        message: 'You have already offered help for this request'
-      });
-    }
-
-    // Add to helperOffers array
-    if (!helpRequest.helperOffers) {
-      helpRequest.helperOffers = [];
-    }
-    
-    helpRequest.helperOffers.push({
-      user: req.user.id,
+    helpRequest.helper = req.user.id;
+    helpRequest.helperOffer = {
       name,
       phone,
       email: email || '',
-      message: message || '',
-      offeredAt: Date.now()
-    });
-
-    // Keep backward compatibility - also set the first helper
-    if (!helpRequest.helper) {
-      helpRequest.helper = req.user.id;
-      helpRequest.helperOffer = {
-        name,
-        phone,
-        email: email || '',
-        message: message || ''
-      };
-      helpRequest.acceptedAt = Date.now();
-    }
+      message: message || ''
+    };
+    helpRequest.status = 'accepted';
+    helpRequest.acceptedAt = Date.now();
 
     await helpRequest.save();
 
     res.status(200).json({
       success: true,
-      data: helpRequest,
-      helperCount: helpRequest.helperOffers.length
+      data: helpRequest
     });
   } catch (error) {
     res.status(500).json({
