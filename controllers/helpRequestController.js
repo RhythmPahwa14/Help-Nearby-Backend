@@ -7,6 +7,11 @@ const User = require('../models/User');
 exports.createHelpRequest = async (req, res) => {
   try {
     req.body.user = req.user.id;
+
+    // Auto-populate contactNumber from the requesting user's phone if not provided
+    if (!req.body.contactNumber && req.user.phone) {
+      req.body.contactNumber = req.user.phone;
+    }
     
     const helpRequest = await HelpRequest.create(req.body);
 
