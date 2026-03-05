@@ -21,12 +21,12 @@ const helpRequestSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please specify a category'],
     enum: [
-      'medical',
-      'emergency',
+      'groceries',
+      'pets',
+      'elderly-care',
+      'tech-support',
+      'household',
       'transport',
-      'food',
-      'shelter',
-      'assistance',
       'other'
     ]
   },
@@ -79,8 +79,7 @@ const helpRequestSchema = new mongoose.Schema({
     type: String
   }],
   contactNumber: {
-    type: String,
-    required: true
+    type: String
   },
   estimatedTime: {
     type: Number, // in minutes
